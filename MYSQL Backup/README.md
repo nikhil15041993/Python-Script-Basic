@@ -1,3 +1,4 @@
+```
 import os
 import time
 import datetime
@@ -28,3 +29,4 @@ os.system(gzipcmd)
 
 print ("Backup script completed")
 print ("Your backups have been created in '" + TODAYBACKUPPATH + "' directory")
+```
