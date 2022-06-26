@@ -43,4 +43,10 @@ pip install django
 pip install gunicorn
 ```
 
+## Step 3. Create a new django project
+
+```
+django-admin startproject <name of project>
+```
+
 
