@@ -104,7 +104,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'myproject',
-        'USER': 'myprojectuser',
+        'USER': 'nikhil',
         'PASSWORD': 'password',
         'HOST': 'localhost',
         'PORT': '',
@@ -203,8 +203,8 @@ After=network.target
 [Service]
 User=sammy
 Group=www-data
-WorkingDirectory=/home/sammy/myprojectdir
-ExecStart=/home/sammy/myprojectdir/myprojectenv/bin/gunicorn \
+WorkingDirectory=/home/ubuntu/anaconda3/envs/myproject
+ExecStart=/home/ubuntu/anaconda3/envs/myenv/bin/gunicorn \
           --access-logfile - \
           --workers 3 \
           --bind unix:/run/gunicorn.sock \
