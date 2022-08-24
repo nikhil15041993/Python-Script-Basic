@@ -61,6 +61,17 @@ source ~/.bashrc
 
 conda --version or  /home/ubuntu/anaconda3/condabin/conda --version
 ```
+### List Packages
+
+```
+conda list 
+```
+it list the pakages under defalut environment
+```
+conda < env name> list 
+```
+it will list the packages from the specific environment
+
 ### Create virtual environment
 
 ```
