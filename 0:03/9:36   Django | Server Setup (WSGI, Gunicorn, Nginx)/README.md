@@ -82,6 +82,13 @@ Active newly created virtual environent
 source activate <name of virtual environment>
 ```
 
+```
+echo "conda activate house_rank" >> ~/.bashrc
+```
+Then close and reopen your terminal or run the following command for the change to take effect:
+
+```source ~/.bashrc```
+
 To Deactive the environment
 ```
 source deactivate
