@@ -462,3 +462,111 @@ docker-compose -f docker-compose.prod.yml up -d --build
 ```
 
 
+## Nginx
+
+Next, let's add Nginx into the mix to act as a reverse proxy for Gunicorn to handle client requests as well as serve up static files.
+
+Add the service to docker-compose.prod.yml:
+
+```
+nginx:
+  build: ./nginx
+  ports:
+    - 1337:80
+  depends_on:
+    - web
+```
+Then, in the local project root, create the following files and folders:
+
+```
+└── nginx
+    ├── Dockerfile
+    └── nginx.conf
+```
+
+Dockerfile:
+
+```
+FROM nginx:1.21-alpine
+
+RUN rm /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d
+```
+
+nginx.conf:
+
+```
+upstream hello_django {
+    server web:8000;
+}
+
+server {
+
+    listen 80;
+
+    location / {
+        proxy_pass http://hello_django;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        proxy_redirect off;
+    }
+
+}
+```
+Review Using NGINX and NGINX Plus as an Application Gateway with uWSGI and Django for more info on configuring Nginx to work with Django.
+
+Then, update the web service, in docker-compose.prod.yml, replacing ports with expose:
+
+```
+web:
+  build:
+    context: ./app
+    dockerfile: Dockerfile.prod
+  command: gunicorn hello_django.wsgi:application --bind 0.0.0.0:8000
+  expose:
+    - 8000
+  env_file:
+    - ./.env.prod
+  depends_on:
+    - db
+```
+Now, port 8000 is only exposed internally, to other Docker services. The port will no longer be published to the host machine.
+
+For more on ports vs expose, review this Stack Overflow question.
+
+Test it out again.
+
+```
+$ docker-compose -f docker-compose.prod.yml down -v
+$ docker-compose -f docker-compose.prod.yml up -d --build
+$ docker-compose -f docker-compose.prod.yml exec web python manage.py migrate --noinput
+```
+Ensure the app is up and running at http://localhost:1337.
+
+Your project structure should now look like:
+```
+
+├── .env.dev
+├── .env.prod
+├── .env.prod.db
+├── .gitignore
+├── app
+│   ├── Dockerfile
+│   ├── Dockerfile.prod
+│   ├── entrypoint.prod.sh
+│   ├── entrypoint.sh
+│   ├── hello_django
+│   │   ├── __init__.py
+│   │   ├── asgi.py
+│   │   ├── settings.py
+│   │   ├── urls.py
+│   │   └── wsgi.py
+│   ├── manage.py
+│   └── requirements.txt
+├── docker-compose.prod.yml
+├── docker-compose.yml
+└── nginx
+    ├── Dockerfile
+    └── nginx.conf
+
+```
